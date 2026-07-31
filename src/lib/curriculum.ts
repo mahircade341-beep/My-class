@@ -1,4 +1,4 @@
-import type { Level } from "./types";
+import type { Level, DeviceId, Resource } from "./types";
 
 export const CURRICULUM: Level[] = [
   {
@@ -1159,3 +1159,317 @@ console.log(result);`,
     }
   },
 ];
+
+// ============================================================
+// Device guides — the school tailors setup + tips to the
+// device the student chooses when they start (Mac / Windows / Android).
+// `setupSteps` is indexed by curriculum level (0 = Zero, 1 = Beginner, ...)
+// ============================================================
+
+export interface DeviceGuide {
+  id: DeviceId;
+  name: string;
+  tagline: string;
+  description: string;
+  color: string;
+  icon: "laptop" | "monitor" | "smartphone" | "pc";
+  lessonTip: string;
+  setupSteps: { title: string; steps: string[] }[];
+  /** Free setup tutorials for this device, indexed by curriculum level (0, 1, 2, ...) */
+  setupResources: Resource[][];
+}
+
+export const DEVICES: DeviceGuide[] = [
+  {
+    id: "mac",
+    name: "Mac",
+    tagline: "macOS",
+    description:
+      "Apple's laptop or desktop. Great for developers — Terminal and Unix tools are built right in.",
+    color: "#94a3b8",
+    icon: "laptop",
+    lessonTip:
+      "Pro tip: on a Mac, ⌘ + Enter runs your code in most editors and this sandbox.",
+    setupSteps: [
+      {
+        title: "Zero — Getting Started",
+        steps: [
+          "No installs needed! The CodeSchool editor runs right in your browser, so you can start coding today.",
+          "Use Safari or Chrome and keep this tab open while you learn.",
+          "Later on, you can continue lessons from your iPhone's Safari too — progress saves automatically.",
+        ],
+      },
+      {
+        title: "Beginner — Real Tools",
+        steps: [
+          "Install Visual Studio Code from code.visualstudio.com — the free editor most pros use.",
+          "Open the Terminal app (Finder → Applications → Utilities) to practice running commands.",
+          "Install Node.js LTS from nodejs.org so you can run JavaScript outside the browser.",
+        ],
+      },
+      {
+        title: "Intermediate — Power Setup",
+        steps: [
+          "Install Homebrew (brew.sh) — the Mac package manager — by pasting the install command into Terminal.",
+          "Run `brew install node` to keep Node updated, then check with `node --version`.",
+          "Use Spotlight (⌘ + Space) to launch Terminal, VS Code, and apps instantly.",
+        ],
+      },
+    ],
+    setupResources: [
+      [
+        { title: "Mac Basics (Apple Support)", url: "https://support.apple.com/guide/mac-help/welcome/mac", type: "guide" },
+        { title: "Safari User Guide", url: "https://support.apple.com/guide/safari/welcome/mac", type: "guide" },
+        { title: "Mac Keyboard Shortcuts", url: "https://support.apple.com/en-us/102650", type: "reference" },
+      ],
+      [
+        { title: "Install VS Code on macOS", url: "https://code.visualstudio.com/docs/setup/mac", type: "tutorial" },
+        { title: "Install Node.js (LTS)", url: "https://nodejs.org/en/download", type: "download" },
+        { title: "Terminal User Guide (Apple)", url: "https://support.apple.com/guide/terminal/welcome/mac", type: "guide" },
+      ],
+      [
+        { title: "Homebrew — the Mac package manager", url: "https://brew.sh/", type: "tool" },
+        { title: "Install Git on Mac", url: "https://git-scm.com/download/mac", type: "download" },
+        { title: "VS Code Key Bindings", url: "https://code.visualstudio.com/docs/getstarted/keybindings", type: "reference" },
+      ],
+    ],
+  },
+  {
+    id: "windows",
+    name: "Windows",
+    tagline: "Windows 10 / 11",
+    description:
+      "The world's most common OS. Everything works here — from the browser editor to a full WSL developer setup.",
+    color: "#3b82f6",
+    icon: "monitor",
+    lessonTip:
+      "Pro tip: on Windows, Ctrl + Enter runs your code in most editors and this sandbox.",
+    setupSteps: [
+      {
+        title: "Zero — Getting Started",
+        steps: [
+          "No installs needed! The CodeSchool editor runs right in your browser, so you can start coding today.",
+          "Use Microsoft Edge or Chrome and keep this tab open while you learn.",
+          "Everything in this level works on any Windows PC or laptop.",
+        ],
+      },
+      {
+        title: "Beginner — Real Tools",
+        steps: [
+          "Install Visual Studio Code from code.visualstudio.com — the free editor most pros use.",
+          "Open PowerShell (search 'PowerShell' in the Start menu) to practice running commands.",
+          "Install Node.js LTS from nodejs.org so you can run JavaScript outside the browser.",
+        ],
+      },
+      {
+        title: "Intermediate — Power Setup",
+        steps: [
+          "Enable Windows Subsystem for Linux: open an admin PowerShell and run `wsl --install`, then restart.",
+          "Inside WSL, install Node with `sudo apt install nodejs npm`.",
+          "Pin VS Code to your taskbar and enable the 'WSL' extension for a real dev environment.",
+        ],
+      },
+    ],
+    setupResources: [
+      [
+        { title: "Windows Help & Learning", url: "https://support.microsoft.com/en-us/windows", type: "guide" },
+        { title: "Microsoft Edge Support", url: "https://support.microsoft.com/en-us/microsoft-edge", type: "guide" },
+      ],
+      [
+        { title: "Install VS Code on Windows", url: "https://code.visualstudio.com/docs/setup/windows", type: "tutorial" },
+        { title: "Install Node.js (LTS)", url: "https://nodejs.org/en/download", type: "download" },
+        { title: "PowerShell Documentation", url: "https://learn.microsoft.com/en-us/powershell/", type: "docs" },
+      ],
+      [
+        { title: "Install WSL (Windows Subsystem for Linux)", url: "https://learn.microsoft.com/en-us/windows/wsl/install", type: "tutorial" },
+        { title: "Windows Terminal Docs", url: "https://learn.microsoft.com/en-us/windows/terminal/", type: "docs" },
+        { title: "Develop in WSL with VS Code", url: "https://code.visualstudio.com/docs/remote/wsl", type: "tutorial" },
+      ],
+    ],
+  },
+  {
+    id: "android",
+    name: "Android",
+    tagline: "Phone / Tablet",
+    description:
+      "Learning from your phone or tablet is totally possible. CodeSchool's editor runs in your browser — no PC required.",
+    color: "#22c55e",
+    icon: "smartphone",
+    lessonTip:
+      "Pro tip: on Android, just tap the Run button — no keyboard shortcut needed.",
+    setupSteps: [
+      {
+        title: "Zero — Getting Started",
+        steps: [
+          "You're learning from a phone or tablet — no problem! The CodeSchool editor runs entirely in your browser.",
+          "Use Chrome on Android for the best experience and keep this tab open.",
+          "All lessons and the built-in code sandbox work perfectly on your device.",
+        ],
+      },
+      {
+        title: "Beginner — Real Tools",
+        steps: [
+          "Install Termux from the Play Store (or F-Droid) — a real Linux terminal for your phone.",
+          "In Termux, run `pkg install nodejs` to install Node.js.",
+          "Optional: install the Acode app for a lightweight code editor made for phones.",
+        ],
+      },
+      {
+        title: "Intermediate — Power Setup",
+        steps: [
+          "Use Termux in split-screen with Acode (or CodeSchool) to edit and run code side by side.",
+          "Connect a Bluetooth or USB-C keyboard — typing code with your thumbs gets old fast!",
+          "Keep practicing in the built-in sandbox: it runs your JavaScript instantly on any device.",
+        ],
+      },
+    ],
+    setupResources: [
+      [
+        { title: "Android.com — about your device", url: "https://www.android.com/", type: "guide" },
+        { title: "Chrome for Android (Play Store)", url: "https://play.google.com/store/apps/details?id=com.android.chrome", type: "download" },
+      ],
+      [
+        { title: "Install Termux (F-Droid)", url: "https://f-droid.org/en/packages/com.termux/", type: "download" },
+        { title: "Termux Wiki — getting started", url: "https://wiki.termux.com/wiki/Main_Page", type: "wiki" },
+        { title: "Acode — code editor for phones", url: "https://play.google.com/store/apps/details?id=com.foxdebug.acode", type: "download" },
+      ],
+      [
+        { title: "Termux Wiki — managing packages", url: "https://wiki.termux.com/wiki/Main_Page", type: "wiki" },
+        { title: "Node.js Learning (official)", url: "https://nodejs.org/en/learn", type: "docs" },
+        { title: "Termux on GitHub", url: "https://github.com/termux/termux-app", type: "repo" },
+      ],
+    ],
+  },
+  {
+    id: "linux",
+    name: "Linux",
+    tagline: "Ubuntu / Fedora / etc.",
+    description:
+      "The developer's favorite. A real terminal and package manager come built in — perfect for learning how code really runs.",
+    color: "#eab308",
+    icon: "pc",
+    lessonTip:
+      "Pro tip: on Linux, Ctrl + Enter runs your code in most editors and this sandbox.",
+    setupSteps: [
+      {
+        title: "Zero — Getting Started",
+        steps: [
+          "No installs needed! The CodeSchool editor runs right in your browser, so you can start coding today.",
+          "Use Firefox or Chrome and keep this tab open while you learn.",
+          "Everything in this level works on any Linux distribution.",
+        ],
+      },
+      {
+        title: "Beginner — Real Tools",
+        steps: [
+          "Install Visual Studio Code from code.visualstudio.com (the .deb/.rpm installer or `sudo snap install code --classic`).",
+          "Open your terminal — on Ubuntu it's Ctrl + Alt + T — to practice running commands.",
+          "Install Node.js LTS from nodejs.org, or with `sudo apt install nodejs npm` (Debian/Ubuntu) or your distro's package manager.",
+        ],
+      },
+      {
+        title: "Intermediate — Power Setup",
+        steps: [
+          "Learn your package manager: `apt` (Debian/Ubuntu), `dnf` (Fedora), or `pacman` (Arch).",
+          "Install Git with `sudo apt install git` (or equivalent) and check `git --version`.",
+          "Create an SSH key for GitHub with `ssh-keygen -t ed25519` and add it to your GitHub account.",
+        ],
+      },
+    ],
+    setupResources: [
+      [
+        { title: "Ubuntu Desktop Guide", url: "https://ubuntu.com/desktop", type: "guide" },
+        { title: "Ubuntu Documentation", url: "https://help.ubuntu.com/", type: "docs" },
+      ],
+      [
+        { title: "Install VS Code on Linux", url: "https://code.visualstudio.com/docs/setup/linux", type: "tutorial" },
+        { title: "Install Node.js (LTS)", url: "https://nodejs.org/en/download", type: "download" },
+        { title: "Command Line for Beginners (Ubuntu)", url: "https://ubuntu.com/tutorials/command-line-for-beginners", type: "tutorial" },
+      ],
+      [
+        { title: "Install Git on Linux", url: "https://git-scm.com/download/linux", type: "download" },
+        { title: "Command Line for Beginners (Ubuntu)", url: "https://ubuntu.com/tutorials/command-line-for-beginners", type: "tutorial" },
+        { title: "Node.js Learning (official)", url: "https://nodejs.org/en/learn", type: "docs" },
+      ],
+    ],
+  },
+];
+
+// ============================================================
+// Device detection — pre-selects the student's device from
+// their browser so they only have to tap to confirm.
+// ============================================================
+
+export function detectDevice(): DeviceId | null {
+  if (typeof navigator === "undefined") return null;
+  const ua = navigator.userAgent || "";
+  const platform = navigator.platform || "";
+
+  if (/android/i.test(ua)) return "android";
+  if (/iphone|ipad|ipod/i.test(ua)) return "android"; // mobile Safari — closest match
+  if (/mac|macintosh|mac os x/i.test(ua + " " + platform)) return "mac";
+  if (/win(dows)?/i.test(platform) || /windows/i.test(ua)) return "windows";
+  if (/linux|ubuntu|fedora|debian/i.test(platform + " " + ua)) return "linux";
+  return null;
+}
+
+// ============================================================
+// Lesson-level device tips — keyed by `${levelIdx}-${lessonIdx}`.
+// Falls back to the device's generic lessonTip when a lesson
+// has no specific tip.
+// ============================================================
+
+const LESSON_DEVICE_TIPS: Record<string, Partial<Record<DeviceId, string>>> = {
+  // Level 0 — Zero
+  "0-0": {
+    mac: "Try the example in the editor above — it runs in your browser, no setup needed on a Mac.",
+    windows: "Try the example in the editor above — it runs in your browser, no setup needed on Windows.",
+    android: "Try the example in the editor — it runs right on your phone, no installs needed.",
+    linux: "Try the example in the editor above — it runs in your browser, no setup needed on Linux.",
+  },
+  "0-1": {
+    android: "Tip: on a phone, switch the editor to full screen for more room while typing.",
+  },
+  "0-2": {
+    mac: "On a Mac, ⌘ + / toggles comments — handy for experimenting with operators.",
+    windows: "On Windows, Ctrl + / toggles comments — handy for experimenting with operators.",
+    linux: "On Linux, Ctrl + / toggles comments — handy for experimenting with operators.",
+  },
+  // Level 1 — Beginner
+  "1-1": {
+    mac: "Later, test functions in Terminal with `node yourfile.js` — Macs include Node-friendly tooling.",
+    windows: "Later, test functions in PowerShell with `node yourfile.js` after installing Node.js.",
+    linux: "Later, test functions in your terminal with `node yourfile.js` — Linux terminals are a coder's home.",
+  },
+  "1-3": {
+    android: "In Termux, you can test arrays by running `node -e 'console.log([1,2,3])'` from your phone.",
+  },
+  // Level 2 — Intermediate
+  "2-0": {
+    mac: "On a Mac, use Spotlight (⌘ + Space) to jump between Terminal and your editor fast.",
+    windows: "On Windows, Win + → snaps your editor and PowerShell side by side for easier testing.",
+    linux: "On Linux, use Alt + Tab or a tiling shortcut to keep your editor and terminal side by side.",
+  },
+  "2-1": {
+    android: "On Android, use Termux split-screen (swipe from the left edge) to edit and run side by side.",
+    mac: "On a Mac, ⌘ + Option + I opens the browser console — great for exploring scope live.",
+    windows: "On Windows, Ctrl + Shift + I opens the browser console — great for exploring scope live.",
+    linux: "On Linux, Ctrl + Shift + I opens the browser console — great for exploring scope live.",
+  },
+};
+
+export function getLessonDeviceTip(
+  levelIdx: number,
+  lessonIdx: number,
+  device: DeviceId | null | undefined
+): string | null {
+  const guide = getDeviceById(device);
+  if (!guide) return null;
+  const specific = LESSON_DEVICE_TIPS[`${levelIdx}-${lessonIdx}`]?.[guide.id];
+  return specific ?? guide.lessonTip;
+}
+
+export function getDeviceById(id: DeviceId | null | undefined): DeviceGuide | null {
+  if (!id) return null;
+  return DEVICES.find((d) => d.id === id) ?? null;
+}

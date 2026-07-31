@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth, SetupNotice, LoadingScreen } from "../lib/auth";
-import { CURRICULUM } from "../lib/curriculum";
-import { getProfile, getMyCertificates, getProgress } from "../lib/api";
+import { CURRICULUM, getDeviceById, detectDevice } from "../lib/curriculum";
+import type { DeviceId } from "../lib/types";
+import { getProfile, getMyCertificates, getProgress, updateDevice } from "../lib/api";
 import { useAsync } from "../lib/useAsync";
+import DevicePicker from "../components/DevicePicker";
 import {
   Card,
   CardHeader,
@@ -20,6 +23,7 @@ import {
   ExternalLink,
   GraduationCap,
   BookOpen,
+  MonitorSmartphone,
 } from "lucide-react";
 import { formatDate } from "../lib/utils";
 
@@ -35,6 +39,21 @@ export default function Profile() {
   const { data: progress, loading: loadingProgress } = useAsync(getProgress, [
     session?.user?.id,
   ]);
+
+  const [pendingDevice, setPendingDevice] = useState<DeviceId | null>(null);
+  const [savingDevice, setSavingDevice] = useState(false);
+  const [detected] = useState<DeviceId | null>(detectDevice);
+  const deviceGuide = getDeviceById(pendingDevice ?? profile?.device ?? null);
+
+  const handleDeviceSelect = async (d: DeviceId) => {
+    setSavingDevice(true);
+    try {
+      await updateDevice(d);
+      setPendingDevice(d);
+    } finally {
+      setSavingDevice(false);
+    }
+  };
 
   if (!ready) return <SetupNotice />;
   if (loadingProfile || loadingCerts || loadingProgress) return <LoadingScreen />;
@@ -81,6 +100,33 @@ export default function Profile() {
             </div>
           </div>
         </div>
+      </Card>
+
+      {/* Device — what the school tailors lessons to */}
+      <Card variant="glass" className="mb-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MonitorSmartphone
+              className="w-5 h-5"
+              style={{ color: deviceGuide?.color ?? "#6366f1" }}
+            />
+            Your Device
+          </CardTitle>
+          <CardDescription>
+            {deviceGuide
+              ? `CodeSchool tailors setup guides and tips to your ${deviceGuide.name}.`
+              : "Choose the device you learn on — setup guides and tips will be tailored to it."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <DevicePicker
+            device={deviceGuide?.id ?? null}
+            detected={detected}
+            onSelect={handleDeviceSelect}
+            saving={savingDevice}
+            compact
+          />
+        </CardContent>
       </Card>
 
       {/* Stats */}

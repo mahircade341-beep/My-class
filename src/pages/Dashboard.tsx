@@ -1,15 +1,19 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth, SetupNotice, LoadingScreen } from "../lib/auth";
-import { CURRICULUM } from "../lib/curriculum";
+import { CURRICULUM, getDeviceById, detectDevice } from "../lib/curriculum";
+import type { DeviceId } from "../lib/types";
 import {
   getProfile,
   getProgress,
   getMyCertificates,
+  updateDevice,
 } from "../lib/api";
 import { useAsync } from "../lib/useAsync";
 import { Card } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Progress } from "../components/ui/progress";
+import DevicePicker from "../components/DevicePicker";
 import {
   ArrowRight,
   CheckCircle2,
@@ -19,6 +23,8 @@ import {
   BookOpen,
   Code2,
   Loader2,
+  MonitorSmartphone,
+  Sparkles,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -34,8 +40,25 @@ export default function Dashboard() {
     [session?.user?.id]
   );
 
+  const [device, setDevice] = useState<DeviceId | null>(null);
+  const [savingDevice, setSavingDevice] = useState(false);
+  const [detected] = useState<DeviceId | null>(detectDevice);
+  const deviceGuide = getDeviceById(device ?? profile?.device);
+  const justSelectedGuide = getDeviceById(device);
+  const detectedGuide = getDeviceById(detected);
+
   if (!ready) return <SetupNotice />;
   if (loadingProfile || loadingProgress || loadingCerts) return <LoadingScreen />;
+
+  const handleDeviceSelect = async (d: DeviceId) => {
+    setSavingDevice(true);
+    try {
+      await updateDevice(d);
+      setDevice(d);
+    } finally {
+      setSavingDevice(false);
+    }
+  };
 
   const levelsWithProgress = CURRICULUM.map((level, index) => {
     const rows = (progress ?? []).filter((p) => p.level_id === index);
@@ -58,6 +81,66 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
+      {/* Device onboarding — the school asks what device you learn on */}
+      {!deviceGuide ? (
+        <Card variant="highlight" className="p-6 sm:p-8 mb-8">
+          <div className="flex items-start gap-4 mb-5">
+            <div className="w-12 h-12 rounded-2xl bg-accent-muted flex items-center justify-center flex-shrink-0">
+              <MonitorSmartphone className="w-6 h-6 text-accent" />
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-cs-100 mb-1">
+                Welcome! Choose your device to start school
+              </h2>
+              <p className="text-sm text-cs-400">
+                Pick the device you'll learn on — Mac, Windows, or Android — and
+                CodeSchool will tailor setup guides and tips for you at every level.
+              </p>
+            </div>
+          </div>
+          <DevicePicker
+            device={device}
+            detected={detected}
+            onSelect={handleDeviceSelect}
+            saving={savingDevice}
+          />
+          {!device && !savingDevice && detectedGuide && (
+            <p className="mt-4 text-xs text-cs-300 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-warning" />
+              We detected you're on <span className="font-semibold text-cs-100">{detectedGuide.name}</span> —
+              just tap it to confirm, or pick a different one. You can change this anytime from your profile.
+            </p>
+          )}
+          {!device && !savingDevice && !detectedGuide && (
+            <p className="mt-4 text-xs text-cs-500 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-warning" />
+              You can change this anytime from your profile.
+            </p>
+          )}
+          {device && justSelectedGuide && (
+            <div className="mt-5 flex items-center gap-2 text-sm text-cs-200">
+              <CheckCircle2 className="w-5 h-5 text-success" />
+              Great — you're set up for{" "}
+              <span className="font-semibold text-cs-100">{justSelectedGuide.name}</span>.
+              Your lessons now include {justSelectedGuide.name}-specific setup steps and tips.
+            </div>
+          )}
+        </Card>
+      ) : (
+        <div className="mb-8 flex items-center gap-3 flex-wrap">
+          <Badge variant="accent" size="md" className="gap-1.5">
+            <MonitorSmartphone className="w-3.5 h-3.5" />
+            Teaching for: {deviceGuide.name}
+          </Badge>
+          <Link
+            to="/profile"
+            className="text-xs text-cs-500 hover:text-accent transition-colors underline underline-offset-2"
+          >
+            Change device
+          </Link>
+        </div>
+      )}
+
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-cs-100 mb-2">
           Welcome back{profile?.display_name ? `, ${profile.display_name}` : ""}!

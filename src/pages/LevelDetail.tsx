@@ -1,8 +1,11 @@
 import { useParams, Link } from "react-router-dom";
 import { useAuth, SetupNotice, LoadingScreen } from "../lib/auth";
-import { CURRICULUM } from "../lib/curriculum";
-import { getProgress, hasPassed } from "../lib/api";
+import { CURRICULUM, getDeviceById, detectDevice } from "../lib/curriculum";
+import type { DeviceId } from "../lib/types";
+import { getProfile, getProgress, hasPassed, updateDevice } from "../lib/api";
 import { useAsync } from "../lib/useAsync";
+import { useState } from "react";
+import DevicePicker from "../components/DevicePicker";
 import {
   Card,
   CardHeader,
@@ -21,6 +24,8 @@ import {
   ExternalLink,
   FileText,
   Brain,
+  MonitorSmartphone,
+  Wrench,
 } from "lucide-react";
 
 export default function LevelDetail() {
@@ -29,11 +34,27 @@ export default function LevelDetail() {
   const level = Number.isInteger(idx) && CURRICULUM[idx] ? CURRICULUM[idx] : null;
   const { session, ready } = useAuth();
 
+  const [pendingDevice, setPendingDevice] = useState<DeviceId | null>(null);
+  const [savingDevice, setSavingDevice] = useState(false);
+  const [detected] = useState<DeviceId | null>(detectDevice);
+  const { data: profile } = useAsync(getProfile, [session?.user?.id]);
   const { data: progress } = useAsync(getProgress, [session?.user?.id]);
   const { data: examPassed, loading: loadingExam } = useAsync(
     () => (Number.isInteger(idx) ? hasPassed(idx).catch(() => false) : Promise.resolve(false)),
     [session?.user?.id, idx]
   );
+
+  const deviceGuide = getDeviceById(pendingDevice ?? profile?.device);
+
+  const handleDeviceSelect = async (d: DeviceId) => {
+    setSavingDevice(true);
+    try {
+      await updateDevice(d);
+      setPendingDevice(d);
+    } finally {
+      setSavingDevice(false);
+    }
+  };
 
   if (!ready) return <SetupNotice />;
 
@@ -133,6 +154,90 @@ export default function LevelDetail() {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Device setup — the school tailors this to your device */}
+          <Card variant="glass">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MonitorSmartphone className="w-4 h-4" style={{ color: deviceGuide?.color ?? "#6366f1" }} />
+                {deviceGuide ? `Setup for ${deviceGuide.name}` : "Setup for your device"}
+              </CardTitle>
+              <CardDescription>
+                {deviceGuide
+                  ? "How to follow this level on your device"
+                  : "Pick your device to get tailored setup steps for this level"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {deviceGuide ? (
+                <div className="space-y-3">
+                  {(() => {
+                    const setup = deviceGuide.setupSteps[Math.min(idx, deviceGuide.setupSteps.length - 1)];
+                    const resources =
+                      deviceGuide.setupResources[Math.min(idx, deviceGuide.setupResources.length - 1)] ?? [];
+                    return (
+                      <>
+                        <p className="text-xs font-semibold text-cs-300 uppercase tracking-wide">
+                          {setup?.title}
+                        </p>
+                        <ul className="space-y-2">
+                          {(setup?.steps ?? []).map((step, si) => (
+                            <li key={si} className="flex items-start gap-2 text-sm text-cs-300">
+                              <span
+                                className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5"
+                                style={{ backgroundColor: `${deviceGuide.color}1f`, color: deviceGuide.color }}
+                              >
+                                {si + 1}
+                              </span>
+                              <span className="leading-relaxed">{step}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        {resources.length > 0 && (
+                          <div className="pt-3 border-t border-cs-700">
+                            <p className="text-xs font-semibold text-cs-300 uppercase tracking-wide mb-2">
+                              Free tutorials for your device
+                            </p>
+                            <div className="space-y-2">
+                              {resources.map((r, ri) => (
+                                <a
+                                  key={ri}
+                                  href={r.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-sm text-cs-300 hover:text-accent transition-colors group"
+                                >
+                                  <FileText className="w-3.5 h-3.5 text-cs-500 group-hover:text-accent flex-shrink-0" />
+                                  <span className="truncate flex-1">{r.title}</span>
+                                  <ExternalLink className="w-3 h-3 text-cs-600 group-hover:text-accent flex-shrink-0" />
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                  <Link
+                    to="/profile"
+                    className="inline-flex items-center gap-1.5 text-xs text-cs-500 hover:text-accent transition-colors underline underline-offset-2"
+                  >
+                    <Wrench className="w-3.5 h-3.5" />
+                    Change device
+                  </Link>
+                </div>
+              ) : (
+                <DevicePicker
+                  device={pendingDevice}
+                  detected={detected}
+                  onSelect={handleDeviceSelect}
+                  saving={savingDevice}
+                  compact
+                />
+              )}
+            </CardContent>
+          </Card>
+
           {/* Resources */}
           <Card variant="glass">
             <CardHeader>

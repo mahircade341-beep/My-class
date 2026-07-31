@@ -62,6 +62,9 @@ Deno.serve(async (req: Request) => {
     }
     if (context?.taskDescription) system += `\n\nCurrent Task: ${context.taskDescription}`;
     if (context?.userCode) system += `\n\nStudent's Current Code:\n${context.userCode}`;
+    if (context?.deviceName) {
+      system += `\n\nThe student is learning on a ${context.deviceName} device. When giving setup instructions, terminal commands, or keyboard shortcuts, tailor them to that device (e.g. macOS Terminal/Homebrew, Windows PowerShell/WSL, Android Termux/Acode).`;
+    }
 
     const res = await fetch("https://api.sambanova.ai/v1/chat/completions", {
       method: "POST",

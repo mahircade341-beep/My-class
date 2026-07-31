@@ -10,9 +10,13 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text,
   display_name text,
+  device text,          -- 'mac' | 'windows' | 'android' (what device the student learns on)
   current_level int not null default 0,
   created_at timestamptz not null default now()
 );
+
+-- Migration-safe: adds the device column if you already ran the earlier version of this script
+alter table public.profiles add column if not exists device text;
 
 -- Completed lessons (level_id / lesson_id are the curriculum indices)
 create table if not exists public.user_progress (

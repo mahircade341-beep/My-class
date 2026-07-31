@@ -13,6 +13,7 @@ interface AITutorProps {
   lessonContent?: string;
   taskDescription?: string;
   userCode?: string;
+  deviceName?: string | null;
 }
 
 export default function AITutor({
@@ -20,6 +21,7 @@ export default function AITutor({
   lessonContent,
   taskDescription,
   userCode,
+  deviceName,
 }: AITutorProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -62,6 +64,7 @@ export default function AITutor({
             lessonContent,
             taskDescription,
             userCode,
+            deviceName,
           },
         },
       });

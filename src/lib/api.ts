@@ -1,10 +1,12 @@
 import { supabase } from "./supabase";
 import { generateCode } from "./utils";
+import type { DeviceId } from "./types";
 
 export interface Profile {
   id: string;
   email: string | null;
   display_name: string | null;
+  device: DeviceId | null;
   current_level: number;
   created_at: string;
 }
@@ -60,6 +62,25 @@ export async function getProgress(): Promise<ProgressRow[]> {
     .eq("user_id", user.id);
   if (error) throw error;
   return (data as ProgressRow[]) ?? [];
+}
+
+export async function updateDevice(device: DeviceId): Promise<void> {
+  const user = await requireUser();
+  const { error } = await supabase!
+    .from("profiles")
+    .update({ device })
+    .eq("id", user.id);
+  if (error) {
+    // Profile row may not exist yet (trigger lag) — create it so the choice sticks.
+    const { error: insertError } = await supabase!.from("profiles").insert({
+      id: user.id,
+      email: user.email ?? null,
+      display_name: user.user_metadata?.name ?? null,
+      device,
+      current_level: 0,
+    });
+    if (insertError) throw insertError;
+  }
 }
 
 export async function completeLesson(

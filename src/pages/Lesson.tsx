@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth, SetupNotice } from "../lib/auth";
-import { CURRICULUM } from "../lib/curriculum";
-import { getProgress, completeLesson } from "../lib/api";
+import { CURRICULUM, getDeviceById, getLessonDeviceTip } from "../lib/curriculum";
+import { getProfile, getProgress, completeLesson } from "../lib/api";
 import { useAsync } from "../lib/useAsync";
 import {
   Card,
@@ -24,6 +24,7 @@ import {
   Bot,
   Sparkles,
   Code,
+  MonitorSmartphone,
 } from "lucide-react";
 
 export default function Lesson() {
@@ -35,7 +36,10 @@ export default function Lesson() {
   const lesson = level && Number.isInteger(lessonIdx) ? level.lessons[lessonIdx] : null;
 
   const { session, ready } = useAuth();
+  const { data: profile } = useAsync(getProfile, [session?.user?.id]);
   const { data: progress } = useAsync(getProgress, [session?.user?.id]);
+  const deviceGuide = getDeviceById(profile?.device ?? null);
+  const deviceTip = lesson ? getLessonDeviceTip(levelIdx, lessonIdx, profile?.device) : null;
 
   const [code, setCode] = useState("");
   const [completed, setCompleted] = useState(false);
@@ -195,6 +199,18 @@ export default function Lesson() {
               <CardDescription>{lesson.taskDescription}</CardDescription>
             </CardHeader>
             <CardContent>
+              {deviceGuide && deviceTip && (
+                <div
+                  className="mb-4 flex items-start gap-2.5 text-xs rounded-lg border px-3 py-2.5"
+                  style={{
+                    borderColor: `${deviceGuide.color}40`,
+                    backgroundColor: `${deviceGuide.color}14`,
+                  }}
+                >
+                  <MonitorSmartphone className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: deviceGuide.color }} />
+                  <span className="text-cs-300">{deviceTip}</span>
+                </div>
+              )}
               <CodeEditor starterCode={code} onCodeChange={setCode} height="300px" />
             </CardContent>
           </Card>
@@ -323,6 +339,7 @@ export default function Lesson() {
                 lessonContent={lesson.content}
                 taskDescription={lesson.taskDescription}
                 userCode={code}
+                deviceName={deviceGuide?.name ?? null}
               />
             ) : (
               <Card

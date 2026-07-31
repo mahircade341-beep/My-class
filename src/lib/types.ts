@@ -1,3 +1,5 @@
+export type DeviceId = "mac" | "windows" | "android" | "linux";
+
 export interface Resource {
   title: string;
   url: string;
