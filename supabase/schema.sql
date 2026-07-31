@@ -41,6 +41,8 @@ create table if not exists public.exam_attempts (
 );
 
 -- Earned certificates (public verification by unique_code)
+-- NOTE: level_id = -1 marks the special full-program Graduation Certificate
+-- (awarded when the student passes the Capstone exam).
 create table if not exists public.certificates (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,

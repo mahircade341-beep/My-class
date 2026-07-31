@@ -2,6 +2,11 @@ import { supabase } from "./supabase";
 import { generateCode } from "./utils";
 import type { DeviceId } from "./types";
 
+/** Sentinel level id used for the full-program Graduation Certificate. */
+export const GRADUATION_LEVEL_ID = -1;
+/** Display name for the graduation certificate. */
+export const GRADUATION_TITLE = "Software Engineering";
+
 export interface Profile {
   id: string;
   email: string | null;
@@ -121,7 +126,13 @@ export async function submitExam(input: {
   answers: unknown;
   levelTitle: string;
   userName: string;
-}): Promise<{ passed: boolean; certificateId: string | null }> {
+  /** True when this is the Capstone exam — also awards the Graduation Certificate. */
+  isGraduation?: boolean;
+}): Promise<{
+  passed: boolean;
+  certificateId: string | null;
+  graduationCertificateId: string | null;
+}> {
   const user = await requireUser();
   const passed =
     input.maxScore > 0 && input.score / input.maxScore >= 0.8;
@@ -138,6 +149,7 @@ export async function submitExam(input: {
   if (error) throw error;
 
   let certificateId: string | null = null;
+  let graduationCertificateId: string | null = null;
   if (passed) {
     const { data: profile } = await supabase!
       .from("profiles")
@@ -157,9 +169,16 @@ export async function submitExam(input: {
       input.levelTitle,
       input.userName
     );
+    if (input.isGraduation) {
+      graduationCertificateId = await generateCertificate(
+        GRADUATION_LEVEL_ID,
+        GRADUATION_TITLE,
+        input.userName
+      );
+    }
   }
 
-  return { passed, certificateId };
+  return { passed, certificateId, graduationCertificateId };
 }
 
 async function generateCertificate(

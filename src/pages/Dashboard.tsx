@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth, SetupNotice, LoadingScreen } from "../lib/auth";
-import { CURRICULUM, getDeviceById, detectDevice } from "../lib/curriculum";
+import { CURRICULUM, getDeviceById, detectDevice } from "../lib/curriculumFull";
 import type { DeviceId } from "../lib/types";
 import {
   getProfile,
   getProgress,
   getMyCertificates,
   updateDevice,
+  GRADUATION_LEVEL_ID,
 } from "../lib/api";
 import { useAsync } from "../lib/useAsync";
 import { Card } from "../components/ui/card";
@@ -78,6 +79,9 @@ export default function Dashboard() {
     0
   );
   const currentLevel = profile?.current_level ?? 0;
+  const graduated = (certificates ?? []).some(
+    (c) => c.level_id === GRADUATION_LEVEL_ID
+  );
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -142,11 +146,21 @@ export default function Dashboard() {
       )}
 
       <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-cs-100 mb-2">
-          Welcome back{profile?.display_name ? `, ${profile.display_name}` : ""}!
-        </h1>
+        <div className="flex items-center gap-3 flex-wrap mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-cs-100">
+            Welcome back{profile?.display_name ? `, ${profile.display_name}` : ""}!
+          </h1>
+          {graduated && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-300 bg-amber-500/15 border border-amber-400/40 rounded-full px-3 py-1">
+              <GraduationCap className="w-3.5 h-3.5" />
+              Graduated
+            </span>
+          )}
+        </div>
         <p className="text-cs-400">
-          Continue your learning journey. You've completed {completedLessons} of {totalLessons} lessons.
+          {graduated
+            ? "Congratulations — you've completed the full CodeSchool program! Explore the Specialization level or review your certificates."
+            : `Continue your learning journey. You've completed ${completedLessons} of ${totalLessons} lessons.`}
         </p>
       </div>
 

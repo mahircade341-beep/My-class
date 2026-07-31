@@ -1158,6 +1158,743 @@ console.log(result);`,
       ]
     }
   },
+  {
+    title: "Advanced JavaScript",
+    subtitle: "Modern JavaScript Mastery",
+    description: "Level up to modern JavaScript: arrow functions, promises, async/await, modules, and error handling — the skills every real codebase uses.",
+    color: "#8b5cf6",
+    resources: [
+      { title: "MDN: Using Promises", url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises", type: "article" },
+      { title: "javascript.info: Async/await", url: "https://javascript.info/async-await", type: "tutorial" },
+      { title: "MDN: JavaScript Modules", url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules", type: "article" },
+      { title: "The Odin Project: Full Stack JS", url: "https://www.theodinproject.com/paths/full-stack-javascript", type: "course" },
+    ],
+    lessons: [
+      {
+        title: "Arrow Functions & Modern Syntax",
+        description: "Write cleaner functions with arrow syntax, destructuring, and template literals",
+        content: `# Arrow Functions & Modern Syntax
+
+ES6 gave JavaScript superpowers. The most visible change: **arrow functions**.
+
+## Arrow Functions
+
+A normal function:
+
+\`\`\`javascript
+function double(n) {
+  return n * 2;
+}
+\`\`\`
+
+The same as an arrow function:
+
+\`\`\`javascript
+const double = (n) => n * 2;
+\`\`\`
+
+- If there's one parameter, parentheses are optional: \`n => n * 2\`
+- If the body is a single expression, it's returned implicitly
+- Arrow functions don't have their own \`this\` — they inherit it from where they're defined
+
+## Template Literals
+
+Backticks allow multi-line strings and interpolation:
+
+\`\`\`javascript
+const name = "Ada";
+console.log(\`Hello, \${name}! Welcome back.\`);
+\`\`\`
+
+## Destructuring
+
+Pull values out of objects and arrays in one line:
+
+\`\`\`javascript
+const user = { name: "Ada", age: 36 };
+const { name, age } = user;          // object destructuring
+const [first, second] = [10, 20];    // array destructuring
+\`\`\`
+
+## Spread & Rest
+
+\`...\` spreads values or collects them:
+
+\`\`\`javascript
+const nums = [1, 2, 3];
+const copy = [...nums, 4];            // [1, 2, 3, 4]
+function sum(...args) { return args.reduce((a, b) => a + b, 0); }
+\`\`\`
+
+## Key Concepts
+
+- **Arrow function** — concise syntax, inherits \`this\`
+- **Template literal** — string with \${expression} interpolation
+- **Destructuring** — unpack values from objects/arrays
+- **Spread/Rest** — \`...\` expands or collects values`,
+        taskDescription: "Write an arrow function called 'greet' that takes a name and returns a template literal: 'Hello, NAME!' (use ${name} interpolation).",
+        starterCode: `// Write an arrow function 'greet' below
+// It should take a 'name' parameter and return \`Hello, \${name}!\`
+
+`,
+        solutionCode: `const greet = (name) => \`Hello, \${name}!\`;`,
+        quizQuestions: [
+          {
+            question: "What do arrow functions inherit instead of having their own this?",
+            options: ["The global object", "The this from where they're defined", "Nothing", "A new this every call"],
+            correctIndex: 1
+          },
+          {
+            question: "Which syntax creates a template literal?",
+            options: ["'single quotes'", "\"double quotes\"", "`backticks`", "/* comment */"],
+            correctIndex: 2
+          },
+          {
+            question: "What does [...nums] do?",
+            options: ["Deletes nums", "Creates a copy of the array", "Sorts the array", "Converts to a string"],
+            correctIndex: 1
+          },
+        ],
+      },
+      {
+        title: "Promises",
+        description: "Handle asynchronous work with promises and fetch data from APIs",
+        content: `# Promises
+
+JavaScript runs one thing at a time, but many tasks (network requests, file reads, timers) take time. **Promises** let you say: \"do this now, and when it finishes, run that.\"
+
+## The Promise Object
+
+\`\`\`javascript
+const wait = new Promise((resolve, reject) => {
+  setTimeout(() => resolve("done!"), 1000);
+});
+
+wait.then((result) => console.log(result)); // "done!" after 1s
+\`\`\`
+
+- \`resolve(value)\` — the task succeeded
+- \`reject(error)\` — the task failed
+- \`.then()\` runs on success, \`.catch()\` on failure
+
+## Chaining
+
+\`\`\`javascript
+fetch("https://api.example.com/data")
+  .then((res) => res.json())
+  .then((data) => console.log(data))
+  .catch((err) => console.error("Failed:", err));
+\`\`\`
+
+Each \`.then\` receives the result of the previous one — this is a **chain**.
+
+## Promise States
+
+- **Pending** — still running
+- **Fulfilled** — succeeded, \`.then\` will run
+- **Rejected** — failed, \`.catch\` will run
+
+## Key Concepts
+
+- **Promise** — represents a future value
+- **resolve / reject** — success / failure callbacks
+- **Chaining** — \`.then().catch()\` sequences async steps`,
+        taskDescription: "Create a promise called 'myPromise' that resolves with the string 'Success!' after 500ms, then chain a .then() that logs the value.",
+        starterCode: `// Create a promise that resolves with "Success!" after 500ms
+// Chain a .then() that logs the resolved value
+
+`,
+        solutionCode: `const myPromise = new Promise((resolve) => {
+  setTimeout(() => resolve("Success!"), 500);
+});
+myPromise.then((value) => console.log(value));`,
+        quizQuestions: [
+          {
+            question: "Which callback runs when a promise succeeds?",
+            options: ["reject", "then", "catch", "finally"],
+            correctIndex: 1
+          },
+          {
+            question: "What are the three states of a promise?",
+            options: ["Start, middle, end", "Pending, fulfilled, rejected", "Open, closed, errored", "Queued, running, done"],
+            correctIndex: 1
+          },
+          {
+            question: "What does .catch() handle?",
+            options: ["Successful values", "Errors from the chain", "Timers", "Events"],
+            correctIndex: 1
+          },
+        ],
+      },
+      {
+        title: "Async/Await & the Event Loop",
+        description: "Write promise code like it's synchronous with async and await",
+        content: `# Async/Await & the Event Loop
+
+\`async/await\` is sugar over promises — you write asynchronous code that reads like normal top-to-bottom code.
+
+## async Functions
+
+An \`async\` function always returns a promise:
+
+\`\`\`javascript
+async function getData() {
+  return "data";
+}
+getData().then(console.log); // "data"
+\`\`\`
+
+## await
+
+\`await\` pauses the function until a promise settles:
+
+\`\`\`javascript
+async function showUser(id) {
+  const res = await fetch(\`/api/users/\${id}\`);
+  const user = await res.json();
+  console.log(user.name);
+}
+\`\`\`
+
+- \`await\` only works inside \`async\` functions
+- Errors propagate automatically — wrap in \`try/catch\`
+
+\`\`\`javascript
+async function safe() {
+  try {
+    const res = await fetch("/api/data");
+    return await res.json();
+  } catch (err) {
+    console.error("Request failed:", err);
+  }
+}
+\`\`\`
+
+## The Event Loop
+
+JavaScript runs on a single thread. Long tasks block the page. The **event loop** moves async callbacks (timers, network, events) to a queue and runs them when the main thread is free:
+
+1. Run synchronous code
+2. When a promise/timer finishes, queue its callback
+3. When the stack is empty, run the next queued callback
+
+## Key Concepts
+
+- **async** — marks a function that returns a promise
+- **await** — pauses until a promise settles
+- **Event loop** — processes async callbacks without blocking`,
+        taskDescription: "Write an async function called 'getUser' that uses await to 'fetch' a user object (simulate with a promise that resolves to { name: 'Ada' }) and returns the name.",
+        starterCode: `// Write an async function 'getUser'
+// Simulate a fetch with a promise that resolves to { name: "Ada" }
+// Return the user's name
+
+`,
+        solutionCode: `async function getUser() {
+  const user = await Promise.resolve({ name: "Ada" });
+  return user.name;
+}`,
+        quizQuestions: [
+          {
+            question: "Where can you use await?",
+            options: ["Anywhere", "Only inside async functions", "Only in loops", "Only in the browser"],
+            correctIndex: 1
+          },
+          {
+            question: "What does an async function always return?",
+            options: ["A number", "A promise", "A string", "Undefined"],
+            correctIndex: 1
+          },
+          {
+            question: "What is the event loop's job?",
+            options: ["To run code on multiple threads", "To process async callbacks without blocking the main thread", "To compile JavaScript", "To manage memory only"],
+            correctIndex: 1
+          },
+        ],
+      },
+      {
+        title: "ES Modules & Error Handling",
+        description: "Split code into modules and handle errors like a professional",
+        content: `# ES Modules & Error Handling
+
+Real apps are split into files. **Modules** keep code organized and reusable.
+
+## Export & Import
+
+\`\`\`javascript
+// math.js
+export const add = (a, b) => a + b;
+export default function multiply(a, b) { return a * b; }
+
+// main.js
+import multiply, { add } from "./math.js";
+console.log(add(2, 3), multiply(2, 3));
+\`\`\`
+
+- \`export default\` — one default export per file
+- \`export { name }\` — named exports, imported with \`{ }\`
+
+## try / catch / finally
+
+\`\`\`javascript
+try {
+  riskyOperation();
+} catch (err) {
+  console.error("Something went wrong:", err.message);
+} finally {
+  cleanup(); // always runs
+}
+\`\`\`
+
+## Throwing Errors
+
+\`\`\`javascript
+function divide(a, b) {
+  if (b === 0) throw new Error("Cannot divide by zero");
+  return a / b;
+}
+\`\`\`
+
+## Key Concepts
+
+- **Module** — a file with exports/imports
+- **Default vs named exports** — one default, many named
+- **try/catch/finally** — handle and clean up errors
+- **throw** — create your own errors`,
+        taskDescription: "Write a function called 'safeDivide' that takes a and b, and if b is 0, throws an error with the message 'Cannot divide by zero' — otherwise returns a / b.",
+        starterCode: `// Write 'safeDivide(a, b)'
+// Throw an Error("Cannot divide by zero") when b is 0
+
+`,
+        solutionCode: `function safeDivide(a, b) {
+  if (b === 0) throw new Error("Cannot divide by zero");
+  return a / b;
+}`,
+        quizQuestions: [
+          {
+            question: "How do you import a default export?",
+            options: ["import { name } from", "import name from", "require()", "import * as all"],
+            correctIndex: 1
+          },
+          {
+            question: "What block ALWAYS runs after try/catch?",
+            options: ["else", "finally", "done", "then"],
+            correctIndex: 1
+          },
+          {
+            question: "What does throw do?",
+            options: ["Logs an error", "Creates and raises an error", "Ends the program silently", "Returns null"],
+            correctIndex: 1
+          },
+        ],
+      },
+    ],
+    exam: {
+      title: "Advanced JavaScript Exam",
+      description: "Show mastery of modern syntax, promises, and async programming.",
+      questions: [
+        {
+          type: "multiple-choice",
+          question: "What will this log?\n\nconst f = (x) => x * 2;\nconsole.log(f(21));",
+          options: ["21", "42", "2", "undefined"],
+          correctIndex: 1
+        },
+        {
+          type: "multiple-choice",
+          question: "Which keyword lets you use promises like synchronous code?",
+          options: ["async/await", "defer", "setTimeout", "promisify"],
+          correctIndex: 0
+        },
+        {
+          type: "multiple-choice",
+          question: "What does fetch() return?",
+          options: ["An array", "A promise", "A string", "A DOM node"],
+          correctIndex: 1
+        },
+        {
+          type: "coding" as const,
+          question: "Write an async function 'getMessage' that returns the string 'Hello, async world!' using await with a promise.",
+          testCases: [
+            { input: "getMessage()", expected: "Hello, async world!" }
+          ]
+        },
+        {
+          type: "multiple-choice",
+          question: "What is the event loop?",
+          options: ["A loop that repeats code", "The mechanism that processes async callbacks when the stack is clear", "A type of for loop", "A browser animation"],
+          correctIndex: 1
+        },
+      ]
+    }
+  },
+  {
+    title: "Data Structures & Algorithms",
+    subtitle: "Think Like an Engineer",
+    description: "Learn to measure and structure code: Big O, arrays, stacks, queues, recursion, and trees — the foundation of every interview and every great system.",
+    color: "#f59e0b",
+    resources: [
+      { title: "freeCodeCamp: Big O Explained", url: "https://www.youtube.com/watch?v=Mo4vesaut8g0", type: "video" },
+      { title: "GeeksforGeeks: Data Structures", url: "https://www.geeksforgeeks.org/data-structures/", type: "course" },
+      { title: "LeetCode", url: "https://leetcode.com/", type: "practice" },
+      { title: "MDN: Recursion", url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#recursion", type: "article" },
+    ],
+    lessons: [
+      {
+        title: "Big O Notation",
+        description: "Measure how fast your code scales as data grows",
+        content: `# Big O Notation
+
+Big O describes **how runtime grows** as input size grows. It's the language engineers use to discuss performance.
+
+## Common Complexities (fast → slow)
+
+- **O(1)** — constant. Same speed no matter the input: reading \`arr[0]\`
+- **O(log n)** — logarithmic. Doubling input adds one step: binary search
+- **O(n)** — linear. One pass over the data: \`for\` loop
+- **O(n log n)** — sorting: merge sort, quicksort
+- **O(n²)** — quadratic. Nested loops
+
+## Examples
+
+\`\`\`javascript
+// O(1) — constant
+const first = arr[0];
+
+// O(n) — linear
+for (const item of arr) {
+  console.log(item);
+}
+
+// O(n²) — nested loops
+for (const a of arr) {
+  for (const b of arr) {
+    console.log(a, b);
+  }
+}
+\`\`\`
+
+## How to Analyze
+
+1. Count the loops — each nested loop multiplies by n
+2. Drop constants — \`2n\` is still O(n)
+3. Keep the largest term — \`n² + n\` is O(n²)
+
+## Key Concepts
+
+- **Big O** — worst-case growth rate of an algorithm
+- **O(1), O(n), O(n²)** — constant, linear, quadratic
+- **Drop constants, keep the biggest term**`,
+        taskDescription: "Write a function 'findMax' that returns the largest number in an array in O(n) time, returning 0 for an empty array.",
+        starterCode: `// Write findMax(arr) returning the largest element in O(n)
+// Return 0 for an empty array
+
+`,
+        solutionCode: `function findMax(arr) {
+  if (arr.length === 0) return 0;
+  let max = arr[0];
+  for (const n of arr) {
+    if (n > max) max = n;
+  }
+  return max;
+}`,
+        quizQuestions: [
+          {
+            question: "What's the complexity of a single for loop over n items?",
+            options: ["O(1)", "O(n)", "O(n²)", "O(log n)"],
+            correctIndex: 1
+          },
+          {
+            question: "Reading one element by index (arr[0]) is...?",
+            options: ["O(n)", "O(log n)", "O(1)", "O(n²)"],
+            correctIndex: 2
+          },
+          {
+            question: "Two nested loops over n items is...?",
+            options: ["O(n)", "O(2n)", "O(n²)", "O(log n)"],
+            correctIndex: 2
+          },
+        ],
+      },
+      {
+        title: "Arrays & Strings",
+        description: "Master the workhorse structures used in nearly every program",
+        content: `# Arrays & Strings
+
+Arrays and strings are the most-used data structures in JavaScript. Knowing their methods (and costs) makes you faster.
+
+## Array Methods
+
+\`\`\`javascript
+const arr = [1, 2, 3];
+arr.push(4);            // add to end:    [1,2,3,4]
+arr.pop();              // remove end:    [1,2,3]
+arr.unshift(0);         // add to front:  [0,1,2,3]
+arr.shift();            // remove front:  [1,2,3]
+arr.indexOf(2);         // find index: 1
+arr.includes(3);        // true
+arr.slice(0, 2);        // copy [1,2] — doesn't mutate
+arr.splice(1, 1);       // remove 1 item at index 1
+\`\`\`
+
+## Transforming
+
+\`\`\`javascript
+const nums = [1, 2, 3, 4];
+nums.map((n) => n * 2);            // [2,4,6,8]
+nums.filter((n) => n > 2);         // [3,4]
+nums.reduce((sum, n) => sum + n, 0); // 10
+nums.sort((a, b) => a - b);        // ascending
+\`\`\`
+
+## Strings
+
+\`\`\`javascript
+const s = "hello";
+s.length;              // 5
+s.toUpperCase();       // "HELLO"
+s.split("");           // ['h','e','l','l','o']
+s.includes("ell");     // true
+s.slice(1, 3);         // "el"
+\`\`\`
+
+Strings are **immutable** — methods return new strings.
+
+## Key Concepts
+
+- **push/pop** — O(1) at the end
+- **unshift/shift** — O(n), it shifts everything
+- **map/filter/reduce** — transform data functionally
+- **Strings are immutable**`,
+        taskDescription: "Write a function 'reverseString' that takes a string and returns it reversed (e.g. 'hello' → 'olleh'). Hint: split → reverse → join.",
+        starterCode: `// Write reverseString(str) — return the string reversed
+// e.g. reverseString("hello") → "olleh"
+
+`,
+        solutionCode: `function reverseString(str) {
+  return str.split("").reverse().join("");
+}`,
+        quizQuestions: [
+          {
+            question: "Which method adds an item to the END of an array?",
+            options: ["unshift", "push", "shift", "concat"],
+            correctIndex: 1
+          },
+          {
+            question: "What does arr.slice(0, 2) do?",
+            options: ["Removes items permanently", "Returns a copy of items 0-1 without mutating", "Sorts the array", "Joins the array"],
+            correctIndex: 1
+          },
+          {
+            question: "Are strings mutable in JavaScript?",
+            options: ["Yes", "No — methods return new strings", "Only uppercase ones", "Only in strict mode"],
+            correctIndex: 1
+          },
+        ],
+      },
+      {
+        title: "Stacks & Queues",
+        description: "Order data with LIFO and FIFO structures",
+        content: `# Stacks & Queues
+
+Two simple but powerful ordering structures.
+
+## Stack — LIFO (Last In, First Out)
+
+Like a pile of plates: the last one added is the first removed.
+
+\`\`\`javascript
+class Stack {
+  constructor() { this.items = []; }
+  push(item) { this.items.push(item); }
+  pop() { return this.items.pop(); }
+  peek() { return this.items[this.items.length - 1]; }
+  get size() { return this.items.length; }
+}
+
+const s = new Stack();
+s.push(1); s.push(2);
+console.log(s.pop()); // 2 — LIFO!
+\`\`\`
+
+Real uses: undo/redo, browser back button, function call stack.
+
+## Queue — FIFO (First In, First Out)
+
+Like a line at a store: first come, first served.
+
+\`\`\`javascript
+class Queue {
+  constructor() { this.items = []; }
+  enqueue(item) { this.items.push(item); }
+  dequeue() { return this.items.shift(); }
+  peek() { return this.items[0]; }
+  get size() { return this.items.length; }
+}
+
+const q = new Queue();
+q.enqueue(1); q.enqueue(2);
+console.log(q.dequeue()); // 1 — FIFO!
+\`\`\`
+
+Real uses: task queues, print jobs, message buffers.
+
+## Key Concepts
+
+- **Stack** — LIFO: push/pop at the same end
+- **Queue** — FIFO: enqueue at back, dequeue at front
+- Both built on arrays for simplicity`,
+        taskDescription: "Build a Stack class with push, pop, peek, and a size getter. Then: push(10), push(20), pop() once, and peek the top (should be 10).",
+        starterCode: `// Build a Stack class with push(), pop(), peek(), and a size getter
+// Then: push(10), push(20), pop() once, peek the top
+
+`,
+        solutionCode: `class Stack {
+  constructor() { this.items = []; }
+  push(item) { this.items.push(item); }
+  pop() { return this.items.pop(); }
+  peek() { return this.items[this.items.length - 1]; }
+  get size() { return this.items.length; }
+}
+const s = new Stack();
+s.push(10);
+s.push(20);
+s.pop();
+console.log(s.peek()); // 10`,
+        quizQuestions: [
+          {
+            question: "A stack is...?",
+            options: ["FIFO", "LIFO", "Random access", "Alphabetical"],
+            correctIndex: 1
+          },
+          {
+            question: "A queue is...?",
+            options: ["LIFO", "FIFO", "Random", "Sorted"],
+            correctIndex: 1
+          },
+          {
+            question: "Which real-world thing behaves like a stack?",
+            options: ["A checkout line", "The undo button", "A printer queue", "A playlist shuffle"],
+            correctIndex: 1
+          },
+        ],
+      },
+      {
+        title: "Recursion & Trees",
+        description: "Solve problems by breaking them into smaller versions of themselves",
+        content: `# Recursion & Trees
+
+A recursive function **calls itself** on a smaller input until it hits a **base case**.
+
+## The Two Parts
+
+1. **Base case** — when to stop
+2. **Recursive case** — call yourself with a smaller problem
+
+\`\`\`javascript
+function factorial(n) {
+  if (n <= 1) return 1;        // base case
+  return n * factorial(n - 1); // recursive case
+}
+factorial(5); // 120
+\`\`\`
+
+## Trees
+
+A **tree** is data in parent/child nodes. The most famous: binary search trees.
+
+\`\`\`javascript
+class Node {
+  constructor(value) {
+    this.value = value;
+    this.left = null;
+    this.right = null;
+  }
+}
+
+// Visit every node: recursion shines here
+function inorder(node) {
+  if (!node) return;
+  inorder(node.left);
+  console.log(node.value);
+  inorder(node.right);
+}
+\`\`\`
+
+## Why It Matters
+
+Recursion is the natural way to handle trees, file systems, JSON, and divide-and-conquer algorithms.
+
+## Key Concepts
+
+- **Base case** — stops recursion
+- **Recursive case** — calls itself on smaller input
+- **Tree** — hierarchical nodes with left/right children
+- Recursion = elegant tree traversal`,
+        taskDescription: "Write a recursive function 'sumUpTo' that returns the sum of all integers from 1 to n (e.g. sumUpTo(5) → 15).",
+        starterCode: `// Write recursive sumUpTo(n) — sum of 1..n
+// sumUpTo(5) → 15
+
+`,
+        solutionCode: `function sumUpTo(n) {
+  if (n <= 1) return n;
+  return n + sumUpTo(n - 1);
+}`,
+        quizQuestions: [
+          {
+            question: "What stops infinite recursion?",
+            options: ["A return", "The base case", "console.log", "Strict mode"],
+            correctIndex: 1
+          },
+          {
+            question: "What is a tree?",
+            options: ["A sorted array", "Data in parent/child nodes", "A type of loop", "A stack of values"],
+            correctIndex: 1
+          },
+          {
+            question: "sumUpTo(3) evaluates to?",
+            options: ["3", "6", "9", "5"],
+            correctIndex: 1
+          },
+        ],
+      },
+    ],
+    exam: {
+      title: "Data Structures & Algorithms Exam",
+      description: "Prove you can analyze complexity and build core data structures.",
+      questions: [
+        {
+          type: "multiple-choice",
+          question: "What is the time complexity of looking up a key in a JavaScript object?",
+          options: ["O(n)", "O(log n)", "O(1)", "O(n²)"],
+          correctIndex: 2
+        },
+        {
+          type: "multiple-choice",
+          question: "Which structure is FIFO?",
+          options: ["Stack", "Queue", "Tree", "Object"],
+          correctIndex: 1
+        },
+        {
+          type: "multiple-choice",
+          question: "What does this print?\n\nfunction f(n) {\n  if (n <= 1) return 1;\n  return n + f(n - 1);\n}\nconsole.log(f(4));",
+          options: ["4", "6", "10", "15"],
+          correctIndex: 2
+        },
+        {
+          type: "coding" as const,
+          question: "Write a function 'countVowels' that returns how many vowels (a, e, i, o, u) are in a string.",
+          testCases: [
+            { input: "countVowels('hello')", expected: "2" }
+          ]
+        },
+        {
+          type: "multiple-choice",
+          question: "Dropping constants, what is 3n + 5?",
+          options: ["O(3n)", "O(n)", "O(5)", "O(n²)"],
+          correctIndex: 1
+        },
+      ]
+    }
+  },
 ];
 
 // ============================================================

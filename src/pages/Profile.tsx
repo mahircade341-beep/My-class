@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth, SetupNotice, LoadingScreen } from "../lib/auth";
-import { CURRICULUM, getDeviceById, detectDevice } from "../lib/curriculum";
+import { CURRICULUM, getDeviceById, detectDevice } from "../lib/curriculumFull";
 import type { DeviceId } from "../lib/types";
-import { getProfile, getMyCertificates, getProgress, updateDevice } from "../lib/api";
+import {
+  getProfile,
+  getMyCertificates,
+  getProgress,
+  updateDevice,
+  GRADUATION_LEVEL_ID,
+} from "../lib/api";
 import { useAsync } from "../lib/useAsync";
 import DevicePicker from "../components/DevicePicker";
 import {
@@ -24,6 +30,7 @@ import {
   GraduationCap,
   BookOpen,
   MonitorSmartphone,
+  Sparkles,
 } from "lucide-react";
 import { formatDate } from "../lib/utils";
 
@@ -203,24 +210,56 @@ export default function Profile() {
             </div>
           ) : (
             <div className="space-y-3">
-              {(certificates ?? []).map((cert) => (
-                <Link key={cert.id} to={`/certificate/${cert.id}`}>
-                  <div className="flex items-center gap-4 p-4 rounded-xl bg-cs-800/50 border border-cs-700 hover:border-accent/30 transition-all group">
-                    <div className="w-12 h-12 rounded-xl bg-warning-muted flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                      <Trophy className="w-6 h-6 text-warning" />
+              {(certificates ?? []).map((cert) => {
+                const isGraduation = cert.level_id === GRADUATION_LEVEL_ID;
+                return (
+                  <Link key={cert.id} to={`/certificate/${cert.id}`}>
+                    <div
+                      className={`flex items-center gap-4 p-4 rounded-xl border transition-all group ${
+                        isGraduation
+                          ? "bg-amber-500/10 border-amber-400/40 hover:border-amber-300"
+                          : "bg-cs-800/50 border-cs-700 hover:border-accent/30"
+                      }`}
+                    >
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform ${
+                          isGraduation ? "bg-amber-500/20" : "bg-warning-muted"
+                        }`}
+                      >
+                        {isGraduation ? (
+                          <GraduationCap className="w-6 h-6 text-amber-400" />
+                        ) : (
+                          <Trophy className="w-6 h-6 text-warning" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3
+                          className={`font-medium transition-colors ${
+                            isGraduation
+                              ? "text-amber-300 group-hover:text-amber-200"
+                              : "text-cs-100 group-hover:text-accent"
+                          }`}
+                        >
+                          {isGraduation ? (
+                            <span className="flex items-center gap-1.5">
+                              Software Engineering Graduate
+                              <Sparkles className="w-3.5 h-3.5" />
+                            </span>
+                          ) : (
+                            <>{cert.level_title} Level</>
+                          )}
+                        </h3>
+                        <p className="text-xs text-cs-500 mt-0.5">
+                          {isGraduation
+                            ? `Full program completion · ${formatDate(cert.issued_at)}`
+                            : `Issued ${formatDate(cert.issued_at)} · Code: ${cert.unique_code}`}
+                        </p>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-cs-500 group-hover:text-accent transition-colors flex-shrink-0" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-cs-100 group-hover:text-accent transition-colors">
-                        {cert.level_title} Level
-                      </h3>
-                      <p className="text-xs text-cs-500 mt-0.5">
-                        Issued {formatDate(cert.issued_at)} · Code: {cert.unique_code}
-                      </p>
-                    </div>
-                    <ExternalLink className="w-4 h-4 text-cs-500 group-hover:text-accent transition-colors flex-shrink-0" />
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </CardContent>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth, SetupNotice, LoadingScreen } from "../lib/auth";
-import { CURRICULUM } from "../lib/curriculum";
+import { CURRICULUM, GRADUATION_LEVEL_INDEX } from "../lib/curriculumFull";
 import type { ExamQuestion } from "../lib/types";
 import { getProfile, submitExam } from "../lib/api";
 import { useAsync } from "../lib/useAsync";
@@ -16,6 +16,7 @@ import {
   Loader2,
   AlertTriangle,
   Award,
+  GraduationCap,
 } from "lucide-react";
 
 export default function Exam() {
@@ -36,6 +37,9 @@ export default function Exam() {
   const [passed, setPassed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [certificateId, setCertificateId] = useState<string | null>(null);
+  const [graduationCertificateId, setGraduationCertificateId] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     if (exam) {
@@ -46,6 +50,7 @@ export default function Exam() {
       setScore(0);
       setPassed(false);
       setCertificateId(null);
+      setGraduationCertificateId(null);
       setCodingCode("");
     }
   }, [idx, exam]);
@@ -107,8 +112,10 @@ export default function Exam() {
         answers: answers.map((a) => ({ answer: a })),
         levelTitle: level.title,
         userName: profile?.display_name ?? "Student",
+        isGraduation: idx === GRADUATION_LEVEL_INDEX,
       });
       setCertificateId(result.certificateId);
+      setGraduationCertificateId(result.graduationCertificateId);
     } catch (err) {
       console.error("Failed to submit exam:", err);
     } finally {
@@ -140,14 +147,32 @@ export default function Exam() {
             )}
           </div>
           <h2 className="text-2xl font-bold text-cs-100 mb-2">
-            {passed ? "Congratulations!" : "Keep Trying!"}
+            {passed
+              ? idx === GRADUATION_LEVEL_INDEX
+                ? "You Graduated! 🎓"
+                : "Congratulations!"
+              : "Keep Trying!"}
           </h2>
           <p className="text-cs-400 mb-4">
             You scored {score} out of {questions.length} (
             {Math.round((score / questions.length) * 100)}%)
           </p>
           {passed && (
-            <Badge variant="success" size="md" className="mb-4">Exam Passed</Badge>
+            <Badge
+              variant="success"
+              size="md"
+              className="mb-4"
+            >
+              {idx === GRADUATION_LEVEL_INDEX
+                ? "Program Complete — Graduated"
+                : "Exam Passed"}
+            </Badge>
+          )}
+          {passed && idx === GRADUATION_LEVEL_INDEX && (
+            <div className="mb-4 flex items-center justify-center gap-2 text-sm text-amber-300 bg-amber-500/10 border border-amber-400/30 rounded-xl px-4 py-2">
+              <GraduationCap className="w-4 h-4" />
+              You've completed the full CodeSchool software engineering program!
+            </div>
           )}
           {!passed && (
             <p className="text-sm text-cs-500 mb-4">
@@ -155,11 +180,19 @@ export default function Exam() {
             </p>
           )}
           <div className="flex items-center justify-center gap-3 flex-wrap">
+            {passed && graduationCertificateId && (
+              <Link to={`/certificate/${graduationCertificateId}`}>
+                <Button variant="success">
+                  <GraduationCap className="w-4 h-4" />
+                  View Graduation Certificate
+                </Button>
+              </Link>
+            )}
             {passed && certificateId && (
               <Link to={`/certificate/${certificateId}`}>
-                <Button variant="success">
+                <Button variant="secondary">
                   <Award className="w-4 h-4" />
-                  View Certificate
+                  View Level Certificate
                 </Button>
               </Link>
             )}

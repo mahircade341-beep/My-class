@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth, SetupNotice } from "../lib/auth";
-import { CURRICULUM, getDeviceById, getLessonDeviceTip } from "../lib/curriculum";
+import { CURRICULUM, getDeviceById, getLessonDeviceTip } from "../lib/curriculumFull";
 import { getProfile, getProgress, completeLesson } from "../lib/api";
 import { useAsync } from "../lib/useAsync";
 import {

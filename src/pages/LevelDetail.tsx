@@ -1,6 +1,12 @@
 import { useParams, Link } from "react-router-dom";
 import { useAuth, SetupNotice, LoadingScreen } from "../lib/auth";
-import { CURRICULUM, getDeviceById, detectDevice } from "../lib/curriculum";
+import {
+  CURRICULUM,
+  getDeviceById,
+  detectDevice,
+  getDeviceSetup,
+  getDeviceResources,
+} from "../lib/curriculumFull";
 import type { DeviceId } from "../lib/types";
 import { getProfile, getProgress, hasPassed, updateDevice } from "../lib/api";
 import { useAsync } from "../lib/useAsync";
@@ -171,9 +177,8 @@ export default function LevelDetail() {
               {deviceGuide ? (
                 <div className="space-y-3">
                   {(() => {
-                    const setup = deviceGuide.setupSteps[Math.min(idx, deviceGuide.setupSteps.length - 1)];
-                    const resources =
-                      deviceGuide.setupResources[Math.min(idx, deviceGuide.setupResources.length - 1)] ?? [];
+                    const setup = getDeviceSetup(deviceGuide.id, idx);
+                    const resources = getDeviceResources(deviceGuide.id, idx);
                     return (
                       <>
                         <p className="text-xs font-semibold text-cs-300 uppercase tracking-wide">
