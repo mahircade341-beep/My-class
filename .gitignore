@@ -25,3 +25,8 @@ dist-ssr
 
 # Supabase CLI temp files
 supabase/.temp/
+
+# Junk / temp artifacts that must never ship
+bunx-*
+node-compile-cache/
+daytona_repl_worker.py
