@@ -1,0 +1,14 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "dependencies": {
+        "create-vite": "^9.1.2",
+      },
+    },
+  },
+  "packages": {
+    "create-vite": ["create-vite@9.1.2", "", { "bin": { "create-vite": "index.js", "cva": "index.js" } }, "sha512-6plDCgTP2LHMQ4QHw8ZgUE+z9vOIU30lC0aq/wF4cOtGNaJg72DdsPS8Jm9geAVnyr4QjgRfepMn8lkXyeSh0g=="],
+  }
+}

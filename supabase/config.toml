@@ -1,0 +1,7 @@
+# CodeSchool Supabase project configuration
+# Used by the Supabase CLI (npx supabase ...) for local dev and function deploys.
+
+project_id = "codeschool"
+
+[functions.tutor]
+verify_jwt = false
