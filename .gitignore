@@ -30,3 +30,8 @@ supabase/.temp/
 bunx-*
 node-compile-cache/
 daytona_repl_worker.py
+
+# Local environment files — never commit secrets
+.env
+.env.*
+!.env.example
